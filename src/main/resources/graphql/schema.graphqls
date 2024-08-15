@@ -1,0 +1,13 @@
+type Session {
+    id: ID!
+    duration: String!
+    completedAt: String!
+}
+
+type Query {
+    getSessions: [Session!]!
+}
+
+type Mutation {
+    saveSession(duration: String!, completedAt: String!): Session!
+}
