@@ -7,6 +7,9 @@ target/
 # sensitive information
 /src/main/resources/application.properties
 
+# Ignore the build output directories
+src/main/resources/static/*
+
 ### STS ###
 .apt_generated
 .classpath
