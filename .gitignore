@@ -7,6 +7,9 @@ target/
 # sensitive information
 /src/main/resources/application.properties
 
+# フロントエンドビルド成果物を無視
+frontend/build/
+
 ### STS ###
 .apt_generated
 .classpath
