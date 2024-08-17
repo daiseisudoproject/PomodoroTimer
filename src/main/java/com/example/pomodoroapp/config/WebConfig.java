@@ -1,4 +1,4 @@
-package com.example.pomodoroapp.config;  // パッケージ名はプロジェクトに合わせてください
+package com.example.pomodoroapp.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
