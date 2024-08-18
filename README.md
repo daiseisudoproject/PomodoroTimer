@@ -31,7 +31,7 @@
 
    ```bash
    git clone https://github.com/daiseisudoproject/PomodoroTimer.git
-   cd pomodoro-timer
+   cd PomodoroApp
 
 2. ルートディレクトリに戻り、Spring Bootアプリケーションを起動します。
 
