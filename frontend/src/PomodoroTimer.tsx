@@ -27,6 +27,7 @@ const TIMER_COUNT_25min = 1 * 60;
 const TIMER_COUNT_5min = 0.5 * 60;
 
 const PomodoroTimer: React.FC = () => {
+  const [isActiveApp, setisActiveApp] = useState(false); // 初期表示や一巡した際に、「開始」と表示させるため
   const [timeLeft25min, setTimeLeft25min] = useState(TIMER_COUNT_25min); // 25分のタイマー
   const [timeLeft5min, setTimeLeft5min] = useState(TIMER_COUNT_5min); // 5分のタイマー
   const [isActive25min, setIsActive25min] = useState(false);
@@ -39,11 +40,14 @@ const PomodoroTimer: React.FC = () => {
   let percentage;
   if (isActive25min) {
     percentage = (timeLeft25min / totalDuration) * 100;
-  } else {
+  } else if (isActive5min) {
     percentage = (timeLeft5min / totalDuration) * 100;
+  } else {
+    percentage = 100;
   }
 
   useEffect(() => {
+    setisActiveApp(true);
     // コンポーネントがマウントされたときに音声オブジェクトを作成
     setAlarmAudio(new Audio(bgm25min));
   }, []);
@@ -77,6 +81,7 @@ const PomodoroTimer: React.FC = () => {
         setTimeLeft5min((prevTimeLeft) => prevTimeLeft - 1);
       }, 1000);
     } else if (timeLeft5min === 0) {
+      setisActiveApp(true);
       setIsActive5min(false);
       setTimeLeft5min(TIMER_COUNT_5min)
       stopAlarm();
@@ -104,8 +109,10 @@ const PomodoroTimer: React.FC = () => {
   };
 
   const startTimer = () => {
+    setisActiveApp(false);
     setIsActive5min(false);
     setIsActive25min(true);
+    setTimeLeft5min(TIMER_COUNT_5min)
 
     // 音楽が鳴っている場合、止める
     if (alarmAudio) {
@@ -154,7 +161,9 @@ const PomodoroTimer: React.FC = () => {
       <div className="timer-wrapper" style={{ '--percentage': percentage } as React.CSSProperties}>
         <div className="timer-text">
         <h2>
-          {isActive25min
+          { isActiveApp
+            ? "開始"
+            : isActive25min
             ? formatTime(timeLeft25min)
             : isActive5min
             ? formatTime(timeLeft5min)
@@ -185,12 +194,19 @@ const PomodoroTimer: React.FC = () => {
       </div>
       <div>
         <h2>Saved Sessions</h2>
-        <ul>
-          {data.getSessions.map((session: any) => (
-            <li key={session.id}>
-              {session.duration} - {new Date(session.completedAt).toLocaleString()}
-            </li>
-          ))}
+        <ul className="scrollable-list">
+          {data.getSessions.length === 0 ? (
+            <li>まだ学習記録がありません</li>
+          ) : (
+            data.getSessions
+              .slice() // 元のデータを変更しないようにコピーを作成
+              .sort((a: any, b: any) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()) // 降順にソート
+              .map((session: any) => (
+                <li key={session.id}>
+                  {session.duration} - {new Date(session.completedAt).toLocaleString()}
+                </li>
+              ))
+          )}
         </ul>
       </div>
     </div>
