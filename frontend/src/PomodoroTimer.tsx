@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import alarmSound from './alarm.mp3';
-// 暑い
+import bgm25min from './bgm_5min.mp3';
+
 const SAVE_SESSION = gql`
   mutation SaveSession($duration: String!, $completedAt: String!) {
     saveSession(duration: $duration, completedAt: $completedAt) {
@@ -23,32 +23,42 @@ const GET_SESSIONS = gql`
   }
 `;
 
-const TIMER_COUNT = 1 * 60;
+const TIMER_COUNT_25min = 1 * 60;
+const TIMER_COUNT_5min = 0.5 * 60;
 
 const PomodoroTimer: React.FC = () => {
-  const [timeLeft, setTimeLeft] = useState(TIMER_COUNT); // 25分のタイマー
-  const [isActive, setIsActive] = useState(false);
+  const [timeLeft25min, setTimeLeft25min] = useState(TIMER_COUNT_25min); // 25分のタイマー
+  const [timeLeft5min, setTimeLeft5min] = useState(TIMER_COUNT_5min); // 5分のタイマー
+  const [isActive25min, setIsActive25min] = useState(false);
+  const [isActive5min, setIsActive5min] = useState(false);
   const [isAlarmPlaying, setIsAlarmPlaying] = useState(false); // アラームの再生状態を管理
   const [alarmAudio, setAlarmAudio] = useState<HTMLAudioElement | null>(null);
   const [saveSession] = useMutation(SAVE_SESSION);
   const { loading, error, data, refetch } = useQuery(GET_SESSIONS);
-  const totalDuration = 25 * 60; // 25分の秒数
-  const percentage = (timeLeft / totalDuration) * 100;
+  const totalDuration = isActive25min ? 1 * 60 : 0.5 * 60; // 25分の秒数
+  let percentage;
+  if (isActive25min) {
+    percentage = (timeLeft25min / totalDuration) * 100;
+  } else {
+    percentage = (timeLeft5min / totalDuration) * 100;
+  }
 
   useEffect(() => {
     // コンポーネントがマウントされたときに音声オブジェクトを作成
-    setAlarmAudio(new Audio(alarmSound));
+    setAlarmAudio(new Audio(bgm25min));
   }, []);
 
+  // 25分タイマー
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
-    if (isActive && timeLeft > 0) {
+    if (isActive25min && timeLeft25min > 0) {
       timer = setInterval(() => {
-        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+        setTimeLeft25min((prevTimeLeft) => prevTimeLeft - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      setIsActive(false);
-      setTimeLeft(TIMER_COUNT)
+    } else if (timeLeft25min === 0) {
+      setIsActive25min(false);
+      setIsActive5min(true);
+      setTimeLeft25min(TIMER_COUNT_25min)
       handleSaveSession();
       playAlarm();
     }
@@ -57,7 +67,26 @@ const PomodoroTimer: React.FC = () => {
         clearInterval(timer);
       }
     };
-  }, [isActive, timeLeft]);
+  }, [isActive25min, timeLeft25min]);
+
+  // 5分タイマー
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    if (isActive5min && timeLeft5min > 0) {
+      timer = setInterval(() => {
+        setTimeLeft5min((prevTimeLeft) => prevTimeLeft - 1);
+      }, 1000);
+    } else if (timeLeft5min === 0) {
+      setIsActive5min(false);
+      setTimeLeft5min(TIMER_COUNT_5min)
+      stopAlarm();
+    }
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [isActive5min, timeLeft5min]);
 
   const playAlarm = () => {
     if (alarmAudio) {
@@ -75,16 +104,25 @@ const PomodoroTimer: React.FC = () => {
   };
 
   const startTimer = () => {
-    setIsActive(true);
+    setIsActive5min(false);
+    setIsActive25min(true);
+
+    // 音楽が鳴っている場合、止める
+    if (alarmAudio) {
+      alarmAudio.pause();
+      alarmAudio.currentTime = 0; // 再生位置をリセット
+      setIsAlarmPlaying(false);
+    }
   };
 
   const pauseTimer = () => {
-    setIsActive(false);
+    setIsActive25min(false);
+    setIsActive5min(false);
   };
 
   const resetTimer = () => {
-    setIsActive(false);
-    setTimeLeft(25 * 60);
+    setIsActive25min(false);
+    setTimeLeft25min(25 * 60);
   };
 
   const formatTime = (seconds: number) => {
@@ -94,7 +132,7 @@ const PomodoroTimer: React.FC = () => {
   };
 
   const handleSaveSession = () => {
-    const duration = formatTime(25 * 60 - timeLeft); // 実際の学習時間を計算
+    const duration = formatTime(25 * 60 - timeLeft25min); // 実際の学習時間を計算
     const completedAt = new Date().toISOString();
 
     saveSession({ variables: { duration, completedAt } })
@@ -115,14 +153,21 @@ const PomodoroTimer: React.FC = () => {
       <h1>Pomodoro Timer</h1>
       <div className="timer-wrapper" style={{ '--percentage': percentage } as React.CSSProperties}>
         <div className="timer-text">
-          <h2>{formatTime(timeLeft)}</h2>
+        <h2>
+          {isActive25min
+            ? formatTime(timeLeft25min)
+            : isActive5min
+            ? formatTime(timeLeft5min)
+            : "停止中" // 初期表示は25分と表示させる
+          }
+        </h2>
         </div>
       </div>
       <div>
-        <button onClick={startTimer} disabled={isActive}>
+        <button onClick={startTimer} disabled={isActive25min}>
           Start
         </button>
-        <button onClick={pauseTimer} disabled={!isActive}>
+        <button onClick={pauseTimer} disabled={!isActive25min}>
           Pause
         </button>
         <button onClick={resetTimer}>
