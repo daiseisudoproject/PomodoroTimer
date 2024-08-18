@@ -23,8 +23,8 @@ const GET_SESSIONS = gql`
   }
 `;
 
-const TIMER_COUNT_25min = 1 * 60;
-const TIMER_COUNT_5min = 0.5 * 60;
+const TIMER_COUNT_25min = 25 * 60;
+const TIMER_COUNT_5min = 5 * 60;
 
 const PomodoroTimer: React.FC = () => {
   const [isActiveApp, setisActiveApp] = useState(false); // 初期表示や一巡した際に、「開始」と表示させるため
@@ -36,7 +36,7 @@ const PomodoroTimer: React.FC = () => {
   const [alarmAudio, setAlarmAudio] = useState<HTMLAudioElement | null>(null);
   const [saveSession] = useMutation(SAVE_SESSION);
   const { loading, error, data, refetch } = useQuery(GET_SESSIONS);
-  const totalDuration = isActive25min ? 1 * 60 : 0.5 * 60; // 25分の秒数
+  const totalDuration = isActive25min ? TIMER_COUNT_25min : TIMER_COUNT_5min;
   let percentage;
   if (isActive25min) {
     percentage = (timeLeft25min / totalDuration) * 100;
@@ -129,12 +129,13 @@ const PomodoroTimer: React.FC = () => {
 
   const resetTimer = () => {
     setIsActive25min(false);
-    setTimeLeft25min(25 * 60);
+    setTimeLeft25min(TIMER_COUNT_25min);
   };
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
+    // 例：「5:30」ではなく、「05:30」のように表示させる
     return `${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
@@ -179,7 +180,7 @@ const PomodoroTimer: React.FC = () => {
         <button onClick={pauseTimer} disabled={!isActive25min}>
           Pause
         </button>
-        <button onClick={resetTimer}>
+        <button onClick={resetTimer} disabled={!isActive25min}>
           Reset
         </button>
         </div>
