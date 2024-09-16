@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
                 // .allowedOrigins("http://localhost:3000")
-                .allowedOrigins("https://pomodorotimer-2pyc.onrender.com/")
+                .allowedOrigins("http://localhost:3000", "https://pomodorotimer-2pyc.onrender.com/")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
