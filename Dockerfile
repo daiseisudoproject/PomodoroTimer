@@ -20,4 +20,4 @@ WORKDIR /app
 COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
 
 # アプリを実行
-CMD ["java", "-jar", "pomodoroapp.jar"]
+CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}"]
