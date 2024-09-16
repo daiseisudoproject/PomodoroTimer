@@ -1,5 +1,5 @@
 # MavenとOpenJDK 17がインストールされた公式イメージを使う
-FROM maven:3.8.6-openjdk-17 AS build
+FROM maven:3.8.7-openjdk-17 AS build
 
 # 作業ディレクトリを設定
 WORKDIR /app
