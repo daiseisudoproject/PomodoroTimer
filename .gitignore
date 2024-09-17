@@ -4,8 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# sensitive information
+# センシティブ情報
 /src/main/resources/application.properties
+/frontend/.env
+/build-and-copy.sh
 
 # フロントエンドビルド成果物を無視
 frontend/build/
