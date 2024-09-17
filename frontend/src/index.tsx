@@ -7,7 +7,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
 const client = new ApolloClient({
   // uri: 'http://localhost:8080/graphql', // Spring Boot GraphQLエンドポイント
-  uri: 'https://pomodorotimer-2pyc.onrender.com/graphql',
+  uri: process.env.REACT_APP_API_URL + '/graphql',
   cache: new InMemoryCache()
 });
 
