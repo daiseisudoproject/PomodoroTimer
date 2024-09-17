@@ -12,7 +12,7 @@
 
 ## デモ
 
-（デプロイされている場合は、デモサイトのリンクをここに追加します）
+https://pomodorotimer-2pyc.onrender.com/
 
 ## インストール
 
