@@ -1,25 +1,27 @@
 # MavenとOpenJDK 17がインストールされた公式イメージを使う
 FROM maven:3.8.3-openjdk-17 AS build
 
-# 作業ディレクトリを設定
 WORKDIR /app
+COPY pom.xml .
+COPY src src
 
-# プロジェクトファイルをコンテナにコピー
-COPY . .
+# Copy Maven wrapper
+COPY mvnw .
+COPY .mvn .mvn
 
-# Mavenでアプリケーションをビルド
-RUN mvn clean package
+# Set execution permission for the Maven wrapper
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests
 
 # JDKを使った実行用のイメージ
 FROM openjdk:17-jdk-alpine
 
-# 作業ディレクトリを設定
-WORKDIR /app
+VOLUME /tmp
 
 # ビルドステージからビルドされたJARファイルをコピー
 COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
 
-EXPOSE 8080
-
 # アプリを実行
-CMD ["java", "-jar", "pomodoroapp.jar"]
+ENTRYPOINT ["java", "-jar", "pomodoroapp.jar"]
+
+EXPOSE 8080
