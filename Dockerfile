@@ -1,8 +1,7 @@
 FROM node:16-alpine AS frontend-build
-WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm install
+WORKDIR /app/frontend
 COPY frontend/ ./
+RUN npm install
 RUN npm run build
 
 # MavenとOpenJDK 17がインストールされた公式イメージを使う
@@ -25,6 +24,9 @@ WORKDIR /app
 
 # ビルドステージからビルドされたJARファイルをコピー
 COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
+
+# 環境変数PORTの値を出力
+RUN echo "PORT is ${PORT}"
 
 # アプリを実行
 CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}", "--server.address=0.0.0.0"]
