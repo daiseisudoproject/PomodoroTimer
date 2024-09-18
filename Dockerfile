@@ -40,4 +40,4 @@ COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.ja
 EXPOSE 8080
 
 # アプリを実行
-CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}"]
+CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}", "--server.address=0.0.0.0"]
