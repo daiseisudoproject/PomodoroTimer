@@ -22,6 +22,6 @@ VOLUME /tmp
 COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
 
 # アプリを実行
-ENTRYPOINT ["java", "-jar", "pomodoroapp.jar"]
+ENTRYPOINT ["java", "-jar", "/app/pomodoroapp.jar"]
 
 EXPOSE 8080
