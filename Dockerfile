@@ -3,6 +3,8 @@ WORKDIR /app/frontend
 COPY frontend/ ./
 RUN npm install
 RUN npm run build
+RUN rm -rf ../src/main/resources/static/*
+RUN cp -r build/* ../src/main/resources/static/
 
 # MavenとOpenJDK 17がインストールされた公式イメージを使う
 FROM maven:3.8.3-openjdk-17 AS build
