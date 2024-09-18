@@ -19,5 +19,7 @@ WORKDIR /app
 # ビルドステージからビルドされたJARファイルをコピー
 COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
 
+EXPOSE 8080
+
 # アプリを実行
-CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}"]
+CMD ["java", "-jar", "pomodoroapp.jar"]
