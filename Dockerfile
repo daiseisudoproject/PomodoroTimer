@@ -1,10 +1,9 @@
+# ステージ1：フロントエンドのビルド
 FROM node:16-alpine AS frontend-build
-WORKDIR /app/frontend
+WORKDIR /app
 COPY frontend/ ./
 RUN npm install
 RUN npm run build
-RUN rm -rf ../src/main/resources/static/*
-RUN cp -r build/* ../src/main/resources/static/
 
 # MavenとOpenJDK 17がインストールされた公式イメージを使う
 FROM maven:3.8.3-openjdk-17 AS build
@@ -14,6 +13,9 @@ WORKDIR /app
 
 # プロジェクトファイルをコンテナにコピー
 COPY . .
+
+# フロントエンドのビルド成果物をバックエンドにコピー
+COPY --from=frontend-build /app/build ./src/main/resources/static
 
 # Mavenでアプリケーションをビルド
 RUN mvn clean package
