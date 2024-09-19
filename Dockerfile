@@ -1,6 +1,9 @@
 # ステージ1：フロントエンドのビルド
 FROM node:16-alpine AS frontend-build
 
+# ビルド時の引数を定義
+ARG REACT_APP_API_URL
+
 # 作業ディレクトリを設定
 WORKDIR /app
 
@@ -12,6 +15,9 @@ RUN npm install
 
 # フロントエンドのソースコードをコピー
 COPY frontend/ ./
+
+# 環境変数を設定
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
 # Reactアプリケーションをビルド
 RUN npm run build
