@@ -1,36 +1,45 @@
 # ステージ1：フロントエンドのビルド
 FROM node:16-alpine AS frontend-build
-WORKDIR /app
-COPY frontend/ ./
-RUN npm install
-RUN npm run build
-
-# MavenとOpenJDK 17がインストールされた公式イメージを使う
-FROM maven:3.8.3-openjdk-17 AS build
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# プロジェクトファイルをコンテナにコピー
-COPY . .
+# package.jsonとpackage-lock.jsonをコピー
+COPY frontend/package*.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# フロントエンドのソースコードをコピー
+COPY frontend/ ./
+
+# Reactアプリケーションをビルド
+RUN npm run build
+
+# ステージ2：バックエンドのビルド
+FROM maven:3.8.3-openjdk-17 AS backend-build
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# バックエンドのソースコードをコピー
+COPY pom.xml ./
+COPY src ./src
 
 # フロントエンドのビルド成果物をバックエンドにコピー
 COPY --from=frontend-build /app/build ./src/main/resources/static
 
-# Mavenでアプリケーションをビルド
+# Mavenでバックエンドをビルド
 RUN mvn clean package
 
-# JDKを使った実行用のイメージ
+# ステージ3：実行環境の設定
 FROM openjdk:17-jdk-alpine
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# ビルドステージからビルドされたJARファイルをコピー
-COPY --from=build /app/target/pomodoroapp-0.0.1-SNAPSHOT.jar /app/pomodoroapp.jar
+# ビルドされたJARファイルをコピー
+COPY --from=backend-build /app/target/*.jar app.jar
 
-# 環境変数PORTの値を出力
-RUN echo "PORT is ${PORT}"
-
-# アプリを実行
-CMD ["java", "-jar", "pomodoroapp.jar", "--server.port=${PORT}", "--server.address=0.0.0.0"]
+# アプリケーションを起動
+CMD ["java", "-jar", "app.jar", "--server.port=${PORT}", "--server.address=0.0.0.0"]
