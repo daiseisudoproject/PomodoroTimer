@@ -14,34 +14,9 @@
 
 https://pomodorotimer-2pyc.onrender.com/
 
-## インストール
+## セキュリティに関する注意
 
-このプロジェクトをローカル環境で動作させるには、以下の手順に従ってください。
-
-### 前提条件
-
-- Node.js（v14以上）
-- npm
-- JDK 17以上
-- Maven
-
-### 手順
-
-1. リポジトリをクローンします。
-
-   ```bash
-   git clone https://github.com/daiseisudoproject/PomodoroTimer.git
-   cd PomodoroApp
-
-2. ルートディレクトリに戻り、Spring Bootアプリケーションを起動します。
-
-    ```bash
-    mvn spring-boot:run
-
-3. ブラウザでアプリケーションにアクセスします。
-
-    ```bash
-    http://localhost:8080
+このリポジトリはソースコードのみを公開しており、APIキーやデータベース接続情報などの機密情報は公開していません。これらの情報は環境変数を使用して安全に管理しています。
 
 ### 使い方
 
